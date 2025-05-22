@@ -4,4 +4,14 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "matplotlib>=3.10.3",
+    "pandas>=2.2.3",
+    "seaborn>=0.13.2",
+    "selenium>=4.32.0",
+    "setuptools>=80.8.0",
+    "undetected-chromedriver",
+]
+
+[tool.uv.sources]
+undetected-chromedriver = { git = "https://github.com/sohag02/undetected-chromedriver.git" }
