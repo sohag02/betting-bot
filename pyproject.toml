@@ -7,9 +7,13 @@ requires-python = ">=3.12"
 dependencies = [
     "matplotlib>=3.10.3",
     "pandas>=2.2.3",
+    "plotly>=6.1.1",
+    "pyrefly>=0.16.2",
     "seaborn>=0.13.2",
     "selenium>=4.32.0",
     "setuptools>=80.8.0",
+    "streamlit>=1.45.1",
+    "telethon>=1.40.0",
     "undetected-chromedriver",
 ]
 
