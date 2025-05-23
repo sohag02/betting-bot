@@ -3,11 +3,6 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 @dataclass
-class Login:
-    username: str
-    password: str
-
-@dataclass
 class Betting:
     minimum_bet: int
     game_link: str
@@ -45,12 +40,6 @@ class Config:
         self.sleep = self._get_sleep()
         self.notification = self._get_notification()
         self.telegram = self._get_telegram()
-
-    def _get_login(self):
-        return Login(
-            username=self.config["LOGIN"]["username"],
-            password=self.config["LOGIN"]["password"]
-        )
 
     def _get_betting(self):
         return Betting(
