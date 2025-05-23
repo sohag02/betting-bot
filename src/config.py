@@ -22,6 +22,18 @@ class Sleep:
     start_time: str
     end_time: str
 
+@dataclass
+class Notification:
+    balance_threshold: int
+    loss_streak_threshold: int
+    
+@dataclass
+class Telegram:
+    api_id: str
+    api_hash: str
+    bot_token: str
+    admin_username: str
+
 class Config:
     def __init__(self):
         self.config = ConfigParser()
@@ -31,6 +43,8 @@ class Config:
         self.betting = self._get_betting()
         self.behaviour = self._get_behaviour()
         self.sleep = self._get_sleep()
+        self.notification = self._get_notification()
+        self.telegram = self._get_telegram()
 
     def _get_login(self):
         return Login(
@@ -54,6 +68,20 @@ class Config:
         return Sleep(
             start_time=self.config["SLEEP"]["start_time"],
             end_time=self.config["SLEEP"]["end_time"]
+        )
+    
+    def _get_notification(self):
+        return Notification(
+            balance_threshold=int(self.config["NOTIFICATION"]["balance_threshold"]),
+            loss_streak_threshold=int(self.config["NOTIFICATION"]["loss_streak_threshold"])
+        )
+
+    def _get_telegram(self):
+        return Telegram(
+            api_id=self.config["TELEGRAM"]["api_id"],
+            api_hash=self.config["TELEGRAM"]["api_hash"],
+            bot_token=self.config["TELEGRAM"]["bot_token"],
+            admin_username=self.config["TELEGRAM"]["admin_username"]
         )
     
 @lru_cache

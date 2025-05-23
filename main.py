@@ -1,16 +1,19 @@
 import csv
-import datetime
+import logging
 import os
 import time
-from selenium.webdriver.common.keys import Keys
-import undetected_chromedriver as uc
-from src.config import get_config
-import logging
 from enum import Enum
+from typing import cast
 
-from src.info import get_last_result, get_current_balance, get_round_id
-from src.actions import press_dragon_box, press_tiger_box, place_bet, wait_for_results
-from src.utils import BetLog, delay, log_bet, is_now_in_range
+import undetected_chromedriver as uc
+
+from src.actions import (place_bet, press_dragon_box, press_tiger_box,
+                         wait_for_results)
+from src.config import get_config
+from src.info import get_current_balance, get_last_result, get_round_id
+from src.tg import notify
+from src.utils import (BetLog, delay, is_daily_report_generated, is_eod,
+                       is_now_in_range, log_bet, save_daily_report, save_summary, generate_graphs)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -23,11 +26,13 @@ logging.basicConfig(
 
 config = get_config()
 
-class BetType(Enum):
+
+class BetType(str, Enum):
     DRAGON = 'D'
     TIGER = 'T'
 
-class BetResult(Enum):
+
+class BetResult(str, Enum):
     WON = 'W'
     LOST = 'L'
     TIE = 'TIE'
@@ -37,11 +42,11 @@ def main():
     logging.info("Starting betting bot")
 
     # Make sure the log file exists
-    if not os.path.exists('bettting_log.csv'):
-        with open('bettting_log.csv', 'w', newline='') as csvfile:
+    if not os.path.exists('data/betting_log.csv'):
+        with open('data/betting_log.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
-            writer.writerow(['timestamp', 'round_id', 'bet_amount', 'result', 'outcome', 'balance'])
-    return
+            writer.writerow(
+                ['timestamp', 'round_id', 'bet_amount', 'result', 'outcome', 'balance'])
 
     driver = uc.Chrome()
     driver.get("https://myplay777.com")
@@ -49,22 +54,32 @@ def main():
     driver.get(config.betting.game_link)
 
     bet_amt = config.betting.minimum_bet
-    bet_placed_on = None # BetType
-    last_bet_status = None # BetResult
+    bet_placed_on : BetType | None = None
+    last_bet_status : BetResult | None = None
+
+    loss_streak = 0
 
     while True:
         if is_now_in_range(config.sleep.start_time, config.sleep.end_time):
             break
+        
+        # Generate daily report if end of day
+        if is_eod():
+            if not is_daily_report_generated():
+                save_daily_report()
+                generate_graphs()
 
         balance = get_current_balance(driver)
 
-        if balance < bet_amt:
+        if balance and balance < bet_amt:
             logging.info("Not enough balance to bet")
             time.sleep(5)
             break
-        
+
+        if balance and balance < config.notification.balance_threshold:
+            notify(f"Balance is below threshold: {balance}")
+
         last = get_last_result(driver)
-        print(last)
         time.sleep(5)
 
         if last == "D":
@@ -83,8 +98,10 @@ def main():
             else:
                 # If this is first bet, bet on dragon
                 press_dragon_box(driver)
-                
-        round_id = get_round_id(driver)
+                bet_placed_on = BetType.DRAGON
+        delay()
+
+        round_id = cast(int, get_round_id(driver))
         logging.info(f"Round ID : {round_id}")
 
         # calculte bet amount
@@ -102,36 +119,42 @@ def main():
         wait_for_results(driver)
 
         # check result
-        current_result = get_last_result(driver)
-        if current_result == bet_placed_on.value:
+        current_result = cast(str, get_last_result(driver))
+        if bet_placed_on is not None and current_result == bet_placed_on.value:
             last_bet_status = BetResult.WON
+            loss_streak = 0
             logging.info(f"Won the bet of {bet_amt} points")
         elif current_result == "TIE":
             last_bet_status = BetResult.TIE
+            loss_streak = 0
             logging.info(f"Tied with the last bet of {bet_amt} points")
         else:
             last_bet_status = BetResult.LOST
-            logging.info(f"Lost the bet of {bet_amt} points")
+            loss_streak += 1
+            logging.info(f"Lost the bet of {bet_amt} points. Streak: {loss_streak}")
+            if loss_streak >= config.notification.loss_streak_threshold:
+                notify(f"Loss streak threshold reached: {loss_streak}")
 
-        
         log_bet(
             BetLog(
                 round_id=round_id,
                 bet_amount=bet_amt,
                 result=current_result,
                 outcome=last_bet_status.value,
-                balance=get_current_balance(driver)
+                balance=cast(int, get_current_balance(driver))
             )
         )
         delay()
+        save_summary()
 
     driver.quit()
 
 
 if __name__ == "__main__":
-    check_interval = 30*60 # 30 minutes
+    check_interval = 30*60  # 30 minutes
     while True:
         sleep = is_now_in_range(config.sleep.start_time, config.sleep.end_time)
+        main()
         if not sleep:
             main()
         logging.info("Sleeping")

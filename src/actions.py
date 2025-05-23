@@ -6,12 +6,14 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from src.info import result_map
+from typing import cast
+from src.utils import delay
 
 def press_dragon_box(driver: uc.Chrome):
     logging.info("Pressing dragon box")
     try:
         btn = driver.find_element(By.XPATH, "//div[contains(@class, 'dragon-box')]")
-        if 'suspended' in btn.get_attribute('class'):
+        if 'suspended' in cast(str, btn.get_attribute('class')):
             time.sleep(1)
             press_dragon_box(driver)
         else:
@@ -25,7 +27,7 @@ def press_tiger_box(driver: uc.Chrome):
     logging.info("Pressing tiger box")
     try:
         btn = driver.find_element(By.XPATH, "//div[contains(@class, 'tiger-box')]")
-        if 'suspended' in btn.get_attribute('class'):
+        if 'suspended' in cast(str, btn.get_attribute('class')):
             time.sleep(1)
             press_tiger_box(driver)
         else:
@@ -59,6 +61,7 @@ def place_bet(driver: uc.Chrome, amount: int):
         bet.send_keys(str(amount))
         time.sleep(1)
         submit = driver.find_element(By.XPATH, '//div[@class="casino-place-bet-action-buttons"]//button[@class="btn btn-primary"]')
+        delay()
         submit.click()
         if verify_bet(driver):
             logging.info(f"Bet placed successfully of amount : {amount}")
@@ -69,7 +72,7 @@ def place_bet(driver: uc.Chrome, amount: int):
         # logging.error(e)
         raise e
 
-def extract_results(driver: uc.Chrome):
+def extract_results(driver: uc.Chrome) -> list[str] | None:
     """Extract the current results from the page"""
     try:
         wait = WebDriverWait(driver, 10)
@@ -83,7 +86,7 @@ def extract_results(driver: uc.Chrome):
         results = []
         for span in result_spans:
             # Get the text content and the class to determine type
-            text = span.get_attribute('class').replace('result', '')
+            text = cast(str, span.get_attribute('class')).replace('result', '')
             result_type = result_map[text]
             results.append(result_type)
         
@@ -103,7 +106,7 @@ def wait_for_results(driver: uc.Chrome):
         #     EC.presence_of_element_located(
         #         (By.CLASS_NAME, "base-timer__label green"))
         # )
-        prev_results = None
+        prev_results: list[str] | None = None
         while True:
             results = extract_results(driver)
             if prev_results and prev_results != results:

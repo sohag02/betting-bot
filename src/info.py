@@ -24,8 +24,7 @@ def get_last_result(driver: uc.Chrome):
         return result_map[classname]
     except Exception as e:
         logging.error('Could not get last result')
-        # logging.error(e)
-        raise e
+        logging.error(e)
         return None
     
 def get_current_balance(driver: uc.Chrome):
@@ -38,8 +37,7 @@ def get_current_balance(driver: uc.Chrome):
         return int(balance.text.replace("pts: : ", ""))
     except Exception as e:
         logging.error('Could not get current balance')
-        # logging.error(e)
-        raise e
+        logging.error(e)
         return None
 
 def get_round_id(driver: uc.Chrome):
@@ -52,6 +50,5 @@ def get_round_id(driver: uc.Chrome):
         return int(round_id.text.replace("Round ID: ", ""))
     except Exception as e:
         logging.error('Could not get round id')
-        # logging.error(e)
-        raise e
+        logging.error(e)
         return None
