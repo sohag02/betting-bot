@@ -14,18 +14,29 @@ from src.info import get_current_balance, get_last_result, get_round_id
 from src.tg import notify
 from src.utils import (BetLog, delay, is_daily_report_generated, is_eod,
                        is_now_in_range, log_bet, save_daily_report, save_summary, generate_graphs)
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s-[%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler("bettingbot.log"),
-        logging.StreamHandler()
-    ],
-)
+from demo import init_status_panel, update_demo_balance
 
 config = get_config()
 
+# ANSI escape codes for coloring
+RESET = "\033[0m"
+BOLD_GREEN = "\033[1;32m"
+
+if config.demo.enabled:
+    format = f'{BOLD_GREEN}[DEMO]{RESET} %(asctime)s-[%(levelname)s] %(message)s'
+    file_name = "bettingbot_demo.log"
+else:
+    format = '%(asctime)s-[%(levelname)s] %(message)s'
+    file_name = "bettingbot.log"
+
+logging.basicConfig(
+    level=logging.INFO,
+    format=format,
+    handlers=[
+        logging.FileHandler(file_name),
+        logging.StreamHandler()
+    ],
+)
 
 class BetType(str, Enum):
     DRAGON = 'D'
@@ -60,6 +71,11 @@ def main():
 
     loss_streak = 0
 
+    if config.demo.enabled:
+        init_status_panel(driver)
+        demo_balance = config.demo.assumed_balance
+        update_demo_balance(driver, demo_balance)
+
     while True:
         if is_now_in_range(config.sleep.start_time, config.sleep.end_time):
             break
@@ -70,7 +86,10 @@ def main():
                 save_daily_report()
                 generate_graphs()
 
-        balance = get_current_balance(driver)
+        if config.demo.enabled:
+            balance = demo_balance
+        else:
+            balance = get_current_balance(driver)
 
         if balance and balance < bet_amt:
             logging.info("Not enough balance to bet")
@@ -116,7 +135,12 @@ def main():
             bet_amt = bet_amt * 2
 
         # place bet
-        place_bet(driver, bet_amt)
+        if not config.demo.enabled:
+            status = place_bet(driver, bet_amt)
+            if not status:
+                logging.info("Bet failed, sleeping for 3 seconds")
+                time.sleep(3)
+                continue
         wait_for_results(driver)
 
         # check result
@@ -125,6 +149,9 @@ def main():
             last_bet_status = BetResult.WON
             loss_streak = 0
             logging.info(f"Won the bet of {bet_amt} points")
+            if config.demo.enabled:
+                demo_balance += bet_amt
+                update_demo_balance(driver, demo_balance)
         elif current_result == "TIE":
             last_bet_status = BetResult.TIE
             loss_streak = 0
@@ -135,6 +162,14 @@ def main():
             logging.info(f"Lost the bet of {bet_amt} points. Streak: {loss_streak}")
             if loss_streak >= config.notification.loss_streak_threshold:
                 notify(f"Loss streak threshold reached: {loss_streak}")
+            if config.demo.enabled:
+                demo_balance -= bet_amt
+                update_demo_balance(driver, demo_balance, "decrease")
+        
+        if config.demo.enabled:
+            final_balance = demo_balance
+        else:
+            final_balance = get_current_balance(driver)
 
         log_bet(
             BetLog(
@@ -142,7 +177,7 @@ def main():
                 bet_amount=bet_amt,
                 result=current_result,
                 outcome=last_bet_status.value,
-                balance=cast(int, get_current_balance(driver))
+                balance=final_balance
             )
         )
         delay()

@@ -8,6 +8,11 @@ class Betting:
     game_link: str
 
 @dataclass
+class Demo:
+    enabled: bool
+    assumed_balance: int
+
+@dataclass
 class Behaviour:
     pause_min: int
     pause_max: int
@@ -35,6 +40,7 @@ class Config:
         self.config.read("config.ini")
         
         self.betting = self._get_betting()
+        self.demo = self._get_demo()
         self.behaviour = self._get_behaviour()
         self.sleep = self._get_sleep()
         self.notification = self._get_notification()
@@ -44,6 +50,12 @@ class Config:
         return Betting(
             minimum_bet=int(self.config["BETTING"]["minimum_bet"]),
             game_link=self.config["BETTING"]["game_link"]
+        )
+
+    def _get_demo(self):
+        return Demo(
+            enabled=self.config.getboolean("DEMO", "enabled"),
+            assumed_balance=int(self.config["DEMO"]["assumed_balance"])
         )
 
     def _get_behaviour(self):

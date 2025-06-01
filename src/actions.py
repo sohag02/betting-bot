@@ -65,8 +65,10 @@ def place_bet(driver: uc.Chrome, amount: int):
         submit.click()
         if verify_bet(driver):
             logging.info(f"Bet placed successfully of amount : {amount}")
+            return True
         else:
             logging.error("Could not place bet")
+            return False
     except Exception as e:
         logging.error('Could not place bet')
         # logging.error(e)
