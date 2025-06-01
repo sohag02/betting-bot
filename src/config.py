@@ -34,7 +34,6 @@ class Config:
         self.config = ConfigParser()
         self.config.read("config.ini")
         
-        self.login = self._get_login()
         self.betting = self._get_betting()
         self.behaviour = self._get_behaviour()
         self.sleep = self._get_sleep()

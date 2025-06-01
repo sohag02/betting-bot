@@ -42,12 +42,13 @@ def main():
     logging.info("Starting betting bot")
 
     # Make sure the log file exists
+    os.makedirs("data", exist_ok=True)
     if not os.path.exists('data/betting_log.csv'):
         with open('data/betting_log.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(
                 ['timestamp', 'round_id', 'bet_amount', 'result', 'outcome', 'balance'])
-
+    
     driver = uc.Chrome()
     driver.get("https://myplay777.com")
     input("Login and Press Enter to continue...")
@@ -150,8 +151,8 @@ def main():
     driver.quit()
 
 
-if __name__ == "__main__":
-    check_interval = 30*60  # 30 minutes
+def run():
+    check_interval = 30 * 60  # 30 minutes
     while True:
         sleep = is_now_in_range(config.sleep.start_time, config.sleep.end_time)
         main()
@@ -159,3 +160,7 @@ if __name__ == "__main__":
             main()
         logging.info("Sleeping")
         time.sleep(check_interval)
+
+
+if __name__ == "__main__":
+    run()
