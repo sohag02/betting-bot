@@ -5,6 +5,8 @@ from src.analytics.summary import calculate_bet_metrics
 
 st.set_page_config(page_title="Dashboard", layout="wide")
 st.title("Dashboard")
+if st.button("🔄 Reload"):
+    st.rerun()
 
 
 st.markdown("""
@@ -51,9 +53,12 @@ with st.sidebar:
     sidebar_btn("charts", "Charts")
     sidebar_btn("daily-report", "Daily Report")
 
-st.page_link("http://localhost:8501/#daily-report", label="Daily Report")
 
-df = pd.read_csv("data/betting_log.csv", parse_dates=["timestamp"])
+@st.cache_data(ttl=10)  # cache for 10 seconds
+def load_data():
+    return pd.read_csv("data/betting_log.csv", parse_dates=["timestamp"])
+
+df = load_data()
 
 
 def capital_growth_chart(df: pd.DataFrame):
@@ -164,7 +169,11 @@ with col4:
     st.markdown("### Profit per Hour")
     profit_per_hour_heatmap(df)
 
-st.markdown("## Daily Report")
-daily_report = pd.read_csv("data/daily_report.csv")
+try:
+    st.markdown("## Daily Report")
+    daily_report = pd.read_csv("data/daily_report.csv")
 
-st.dataframe(daily_report)
+    st.dataframe(daily_report)
+except:
+    st.write("No Daily Report Available")
+    pass
