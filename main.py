@@ -7,7 +7,7 @@ from typing import cast
 
 import undetected_chromedriver as uc
 
-from demo import (get_last_demo_balance, init_status_panel,
+from src.demo import (get_last_demo_balance, init_status_panel,
                   is_input_balance_changed, save_input_balance,
                   save_last_balance, update_demo_balance)
 from src.actions import (place_bet, press_dragon_box, press_tiger_box,
@@ -57,7 +57,6 @@ def main():
 
     os.makedirs("internal", exist_ok=True)
     changed = is_input_balance_changed()
-    print(changed)
     if changed is True:
         logging.info("Input Demo balance changed in config")
         save_input_balance()
