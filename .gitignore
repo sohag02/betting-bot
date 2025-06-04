@@ -16,3 +16,5 @@ wheels/
 *.session-journal
 *.json
 test.py
+internal/*
+*.zip
