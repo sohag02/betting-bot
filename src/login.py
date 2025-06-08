@@ -20,7 +20,7 @@ def close_modal(driver: uc.Chrome):
 
 def demo_login(driver: uc.Chrome):
     logging.info("Logging in with demo credentials")
-    login_box = WebDriverWait(driver, 10).until(
+    login_box = WebDriverWait(driver, 20).until(
         EC.presence_of_element_located((By.CLASS_NAME, "login-box"))
     )
     login_btn = login_box.find_element(
@@ -37,7 +37,7 @@ def login(driver: uc.Chrome):
         return
     
     logging.info(f"Logging in with username: {config.login.username}")
-    login_box = WebDriverWait(driver, 10).until(
+    login_box = WebDriverWait(driver, 20).until(
         EC.presence_of_element_located((By.CLASS_NAME, "login-box"))
     )
     login_btn = login_box.find_element(

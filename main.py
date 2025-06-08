@@ -9,7 +9,7 @@ import undetected_chromedriver as uc
 
 from src.demo import (get_last_demo_balance, init_status_panel,
                   is_input_balance_changed, save_input_balance,
-                  save_last_balance, update_demo_balance)
+                  save_last_balance, update_demo_balance, click_video)
 from src.actions import (place_bet, press_dragon_box, press_tiger_box,
                          wait_for_results)
 from src.config import get_config
@@ -17,10 +17,16 @@ from src.info import get_current_balance, get_last_result, get_round_id
 from src.tg import notify
 from src.utils import (BetLog, delay, generate_graphs,
                        is_daily_report_generated, is_eod, is_now_in_range,
-                       log_bet, save_daily_report, save_summary)
+                       log_bet, save_daily_report, save_summary, reconnect)
 from src.login import login
 
 config = get_config()
+
+# Suppress Selenium logs
+logging.getLogger('selenium').setLevel(logging.WARNING)
+
+# Suppress undetected_chromedriver logs
+logging.getLogger('undetected_chromedriver').setLevel(logging.WARNING)
 
 # ANSI escape codes for coloring
 RESET = "\033[0m"
@@ -69,8 +75,9 @@ def main():
             writer = csv.writer(csvfile)
             writer.writerow(
                 ['timestamp', 'round_id', 'bet_amount', 'result', 'outcome', 'balance'])
-    
-    driver = uc.Chrome()
+    options = uc.ChromeOptions()
+    options.add_argument("--log-level=3")  # 0=INFO, 1=WARNING, 2=LOG_ERROR, 3=LOG_FATAL
+    driver = uc.Chrome(options=options)
     driver.get("https://myplay777.com")
     login(driver)
     driver.get(config.betting.game_link)
@@ -101,8 +108,11 @@ def main():
                     save_daily_report()
                     generate_graphs()
 
+            reconnect(driver)
+            
             if config.demo.enabled:
                 balance = demo_balance
+                click_video(driver)
             else:
                 balance = get_current_balance(driver)
 
@@ -167,6 +177,7 @@ def main():
                 if config.demo.enabled:
                     demo_balance += bet_amt
                     update_demo_balance(driver, demo_balance)
+                    click_video(driver)
             elif current_result == "TIE":
                 last_bet_status = BetResult.TIE
                 loss_streak = 0
@@ -180,6 +191,8 @@ def main():
                 if config.demo.enabled:
                     demo_balance -= bet_amt
                     update_demo_balance(driver, demo_balance, "decrease")
+            
+            reconnect(driver)
             
             if config.demo.enabled:
                 final_balance = demo_balance

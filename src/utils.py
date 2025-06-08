@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from src.config import get_config
 from selenium.webdriver.remote.webdriver import WebDriver
+from selenium.webdriver.common.by import By
 import logging
 import time
 import random
@@ -38,6 +39,13 @@ def navigate(driver: WebDriver, url: str):
         window.history.pushState(null, '', '{url}');
         window.dispatchEvent(new Event('popstate'));
     """)
+
+def reconnect(driver: WebDriver):
+    try:
+        driver.find_element(By.XPATH, "//button[normalize-space(text())='Reconnect']").click()
+        logging.info("Reconnected")
+    except Exception as e:
+        pass
 
 
 def log_bet(bet_log: BetLog):

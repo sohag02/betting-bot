@@ -1,5 +1,6 @@
 import os
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from typing import Literal
 from src.config import get_config
 import logging
@@ -68,3 +69,13 @@ def get_last_demo_balance():
         with open("internal/last_balance.txt", "r") as f:
             return int(f.read())
     return None
+
+def click_video(driver: webdriver.Chrome):
+    logging.debug("Clicking video")
+    try:
+        video = driver.find_element(By.TAG_NAME, "video")
+        video.click()
+        logging.debug("Video clicked")
+        return True
+    except Exception as e:
+        logging.debug('Could not click video')
