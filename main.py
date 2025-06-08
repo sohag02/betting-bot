@@ -18,6 +18,7 @@ from src.tg import notify
 from src.utils import (BetLog, delay, generate_graphs,
                        is_daily_report_generated, is_eod, is_now_in_range,
                        log_bet, save_daily_report, save_summary)
+from src.login import login
 
 config = get_config()
 
@@ -71,7 +72,7 @@ def main():
     
     driver = uc.Chrome()
     driver.get("https://myplay777.com")
-    input("Login and Press Enter to continue...")
+    login(driver)
     driver.get(config.betting.game_link)
 
     bet_amt = config.betting.minimum_bet
