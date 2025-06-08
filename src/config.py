@@ -4,6 +4,7 @@ from functools import lru_cache
 
 @dataclass
 class Login:
+    use_demo: bool
     username: str
     password: str
 
@@ -54,6 +55,7 @@ class Config:
 
     def _get_login(self):
         return Login(
+            use_demo=self.config.getboolean("LOGIN", "use_demo"),
             username=self.config["LOGIN"]["username"],
             password=self.config["LOGIN"]["password"]
         )

@@ -5,7 +5,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from src.config import get_config
 from src.utils import delay
-import time
 
 config = get_config()
 
@@ -19,8 +18,24 @@ def close_modal(driver: uc.Chrome):
     except Exception as e:
         pass
 
+def demo_login(driver: uc.Chrome):
+    logging.info("Logging in with demo credentials")
+    login_box = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, "login-box"))
+    )
+    login_btn = login_box.find_element(
+        By.XPATH, "//button[@type='submit' and normalize-space(text())='Demo']")
+    login_btn.click()
+    delay()
+    logging.info("Demo Login successful")
+    close_modal(driver)
 
 def login(driver: uc.Chrome):
+
+    if config.login.use_demo:
+        demo_login(driver)
+        return
+    
     logging.info(f"Logging in with username: {config.login.username}")
     login_box = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.CLASS_NAME, "login-box"))
