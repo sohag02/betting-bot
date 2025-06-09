@@ -14,7 +14,7 @@ from src.actions import (place_bet, press_dragon_box, press_tiger_box,
                          wait_for_results)
 from src.config import get_config
 from src.info import get_current_balance, get_last_result, get_round_id
-from src.tg import notify
+from src.tg import notify, send_sync
 from src.utils import (BetLog, delay, generate_graphs,
                        is_daily_report_generated, is_eod, is_now_in_range,
                        log_bet, save_daily_report, save_summary, reconnect)
@@ -122,7 +122,10 @@ def main():
                 break
 
             if balance and balance < config.notification.balance_threshold:
-                notify(f"Balance is below threshold: {balance}")
+                try:
+                    send_sync(f"Balance is below threshold: {balance}")
+                except Exception as e:
+                    logging.error(f'Failed to send balance notification: {e}')
 
             last = get_last_result(driver)
             time.sleep(5)
@@ -187,7 +190,10 @@ def main():
                 loss_streak += 1
                 logging.info(f"Lost the bet of {bet_amt} points. Streak: {loss_streak}")
                 if loss_streak >= config.notification.loss_streak_threshold:
-                    notify(f"Loss streak threshold reached: {loss_streak}")
+                    try:
+                        send_sync(f"Loss streak threshold reached: {loss_streak}")
+                    except Exception as e:
+                        logging.error(f'Failed to send loss streak notification: {e}')
                 if config.demo.enabled:
                     demo_balance -= bet_amt
                     update_demo_balance(driver, demo_balance, "decrease")
