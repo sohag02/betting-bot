@@ -1,7 +1,11 @@
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from analytics.summary import calculate_bet_metrics
+from src.analytics.summary import calculate_bet_metrics
 
 st.set_page_config(page_title="Dashboard", layout="wide")
 st.title("Dashboard")
@@ -81,7 +85,7 @@ def win_loss_pie_chart(df: pd.DataFrame):
     fig = px.pie(
         names=["Wins", "Losses"],
         values=[win_count, loss_count],
-        color_discrete_sequence=["red", "green"],
+        color_discrete_sequence=["green", "red"],
         labels=["Wins", "Losses"]
     )
     return st.plotly_chart(fig)
