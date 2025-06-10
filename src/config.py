@@ -11,6 +11,7 @@ class Login:
 @dataclass
 class Betting:
     minimum_bet: int
+    site_link: str
     game_link: str
 
 @dataclass
@@ -63,6 +64,7 @@ class Config:
     def _get_betting(self):
         return Betting(
             minimum_bet=int(self.config["BETTING"]["minimum_bet"]),
+            site_link=self.config["BETTING"]["site_link"],
             game_link=self.config["BETTING"]["game_link"]
         )
 

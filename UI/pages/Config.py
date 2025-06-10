@@ -36,6 +36,7 @@ with st.form("config"):
 
     st.markdown("#### Betting")
     minimum_bet = st.text_input("Minimum Bet Amount", value=config.betting.minimum_bet)
+    site_link = st.text_input("Site Link", value=config.betting.site_link)
     game_link = st.text_input("Game Link", value=config.betting.game_link)
     st.write("")
 

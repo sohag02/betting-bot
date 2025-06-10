@@ -78,7 +78,7 @@ def main():
     options = uc.ChromeOptions()
     options.add_argument("--log-level=3")  # 0=INFO, 1=WARNING, 2=LOG_ERROR, 3=LOG_FATAL
     driver = uc.Chrome(options=options)
-    driver.get("https://myplay777.com")
+    driver.get(config.betting.site_link)
     login(driver)
     driver.get(config.betting.game_link)
 
