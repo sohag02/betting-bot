@@ -5,6 +5,20 @@ import os
 st.set_page_config(page_title="Betting Bot")
 st.title("Betting Bot")
 
+st.markdown("""
+    <style>
+        .reportview-container {
+            margin-top: -2em;
+        }
+        #MainMenu {visibility: hidden;}
+        .stAppDeployButton {display:none;}
+        .stAppHeader {display:none;}
+        .stMainBlockContainer {padding-top: 0;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+    </style>
+""", unsafe_allow_html=True)
+
 st.markdown("#### Last Error Screenshot")
 if os.path.exists("screenshot.png"):
     st.image("screenshot.png")

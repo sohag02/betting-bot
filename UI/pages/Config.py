@@ -10,23 +10,23 @@ config = get_config()
 st.set_page_config(page_title="Betting Bot")
 st.title("Betting Bot")
 
-if "script_running" not in st.session_state:
-    st.session_state.script_running = False
-
-st.session_state.use_demo = False
-
-def toggle_demo():
-    st.session_state.use_demo = not st.session_state.use_demo
+st.markdown("""
+    <style>
+        .reportview-container {
+            margin-top: -2em;
+        }
+        #MainMenu {visibility: hidden;}
+        .stAppDeployButton {display:none;}
+        .stAppHeader {display:none;}
+        .stMainBlockContainer {padding-top: 0;}
+        footer {visibility: hidden;}
+        #stDecoration {display:none;}
+    </style>
+""", unsafe_allow_html=True)
 
 with st.form("config"):
     st.markdown("#### Login")
     use_demo = st.toggle("Use Demo Login", value=config.login.use_demo)
-    
-    # if use_demo:
-    #     st.write("Demo Login Enabled")
-    #     username = None
-    #     password = None
-    # else:
 
     cola, colb = st.columns(2)
     with cola:

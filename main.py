@@ -227,7 +227,7 @@ def main():
 
 
 def run():
-    check_interval = 30 * 60  # 30 minutes
+    check_interval = 2 * 60  # 2 minutes
     while True:
         sleep = is_now_in_range(config.sleep.start_time, config.sleep.end_time)
         main()
