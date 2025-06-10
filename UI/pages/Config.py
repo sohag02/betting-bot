@@ -3,6 +3,7 @@ import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 import streamlit as st
+from configupdater import ConfigUpdater
 from src.config import get_config
 
 config = get_config()
@@ -80,5 +81,37 @@ with st.form("config"):
     submitted = st.form_submit_button("Run")
 
     if submitted:
-        st.write("Configuration saved")
+        updater = ConfigUpdater()
+        updater.read('config.ini')
+
+        updater['LOGIN']['use_demo'] = use_demo
+        updater['LOGIN']['username'] = username
+        updater['LOGIN']['password'] = password
+
+        updater['BETTING']['minimum_bet'] = minimum_bet
+        updater['BETTING']['site_link'] = site_link
+        updater['BETTING']['game_link'] = game_link
+
+        updater['DEMO']['enabled'] = enabled
+        updater['DEMO']['assumed_balance'] = assumed_balance
+
+        updater['BEHAVIOUR']['pause_min'] = pause_min
+        updater['BEHAVIOUR']['pause_max'] = pause_max
+
+        updater['SLEEP']['start_time'] = start_time
+        updater['SLEEP']['end_time'] = end_time
+
+        updater['NOTIFICATION']['balance_threshold'] = balance_threshold
+        updater['NOTIFICATION']['loss_streak_threshold'] = loss_streak_threshold
+
+        updater['TELEGRAM']['api_id'] = api_id
+        updater['TELEGRAM']['api_hash'] = api_hash
+        updater['TELEGRAM']['bot_token'] = bot_token
+        updater['TELEGRAM']['admin_username'] = admin_username
+
+        with open('config.ini', 'w') as f:
+            updater.write(f)
+
+
+        st.write("Configuration saved Successfully")
         

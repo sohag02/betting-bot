@@ -32,7 +32,7 @@ if os.path.exists("screenshot.png"):
 else:
     st.write("No Screenshot Available")
 
-st.markdown("#### Download CSVs")
+st.markdown("#### Download Data")
 
 col1, col2 = st.columns(2)
 
@@ -83,3 +83,25 @@ with col2:
             )
     else:
         st.write("Daily Report CSV Not Found")
+
+if os.path.exists("config.ini"):
+    file_size = os.path.getsize("config.ini") / 1024  # KB
+    mod_time = datetime.fromtimestamp(os.path.getmtime("config.ini"))
+    
+    st.markdown(f"""
+    <div class="download-section">
+        <div class="file-info">
+            📄 <strong>Config</strong><br>
+            Size: {file_size:.1f} KB<br>
+            Last Updated: {mod_time.strftime("%Y-%m-%d %H:%M:%S")}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.download_button(
+        label="Download Config",
+        data=open("config.ini", "rb"),
+        file_name="config.ini",
+        mime="text/plain"
+    )
+else:
+    st.write("Config Not Found")
