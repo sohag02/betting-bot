@@ -1,0 +1,36 @@
+name: Build and Publish to GHCR
+
+on:
+  push:
+    branches:
+      - main # trigger on pushes to main
+
+permissions:
+  contents: read
+  packages: write # required for publishing to ghcr.io
+  id-token: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Define image name
+        id: vars
+        run: echo "IMAGE=ghcr.io/${{ github.repository_owner }}/my-app:latest" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: docker build -t ${{ steps.vars.outputs.IMAGE }} .
+
+      - name: Push Docker image
+        run: docker push ${{ steps.vars.outputs.IMAGE }}
