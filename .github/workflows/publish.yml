@@ -27,7 +27,7 @@ jobs:
 
       - name: Define image name
         id: vars
-        run: echo "IMAGE=ghcr.io/${{ github.repository_owner }}/my-app:latest" >> $GITHUB_OUTPUT
+        run: echo "IMAGE=ghcr.io/${{ github.repository }}:latest" >> $GITHUB_OUTPUT
 
       - name: Build Docker image
         run: docker build -t ${{ steps.vars.outputs.IMAGE }} .
