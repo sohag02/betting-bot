@@ -91,7 +91,7 @@ def calculate_bet_metrics(csv_file_path: str) -> dict:
     max_losing_streak = 0
     current_losing_streak = 0
     for outcome in df['outcome']:
-        if outcome == 'l':
+        if outcome in ['l', 'tie']:
             current_losing_streak += 1
         else:
             if current_losing_streak > max_losing_streak:
