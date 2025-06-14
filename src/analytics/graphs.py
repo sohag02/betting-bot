@@ -2,8 +2,6 @@ from matplotlib.ticker import MaxNLocator
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-import numpy as np
-
 
 def generate_capital_growth_curve(df: pd.DataFrame, save=True):
     # convert round_id to serial number

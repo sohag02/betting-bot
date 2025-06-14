@@ -91,7 +91,7 @@ def main():
 
         if config.demo.enabled:
             init_status_panel(driver)
-            demo_balance = get_last_demo_balance() if not is_input_balance_changed() else config.demo.assumed_balance
+            demo_balance = config.demo.assumed_balance if is_input_balance_changed() else get_last_demo_balance()
             update_demo_balance(driver, demo_balance)
             logging.info(f"Using Demo balance: {demo_balance}")
 
@@ -107,7 +107,6 @@ def main():
             reconnect(driver)
             balance = demo_balance if config.demo.enabled else get_current_balance(driver)
             
-            # ... (The entire betting logic from the previous answer remains here)
             if config.demo.enabled:
                 click_video(driver)
 
@@ -149,11 +148,10 @@ def main():
             elif last_bet_status == BetResult.WON:
                 bet_amt = config.betting.minimum_bet
 
-            if not config.demo.enabled:
-                if not place_bet(driver, bet_amt):
-                    logging.warning("Bet failed, skipping round.")
-                    time.sleep(3)
-                    continue
+            if not config.demo.enabled and not place_bet(driver, bet_amt):
+                logging.warning("Bet failed, skipping round.")
+                time.sleep(3)
+                continue
             
             wait_for_results(driver)
             current_result = cast(str, get_last_result(driver))

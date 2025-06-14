@@ -11,31 +11,39 @@ from src.utils import delay
 
 def press_dragon_box(driver: uc.Chrome):
     logging.info("Pressing dragon box")
-    try:
-        btn = driver.find_element(By.XPATH, "//div[contains(@class, 'dragon-box')]")
-        if 'suspended' in cast(str, btn.get_attribute('class')):
-            time.sleep(1)
-            press_dragon_box(driver)
-        else:
-            btn.click()
-    except Exception as e:
-        logging.error('Could not press dragon box')
-        # logging.error(e)
-        raise e
+
+    def try_press():
+        try:
+            btn = driver.find_element(By.XPATH, "//div[contains(@class, 'dragon-box')]")
+            if 'suspended' in cast(str, btn.get_attribute('class')):
+                time.sleep(1)
+                return try_press()  # recursive retry
+            else:
+                btn.click()
+        except Exception as e:
+            logging.error('Could not press dragon box')
+            raise e
+
+    try_press()
+
 
 def press_tiger_box(driver: uc.Chrome):
     logging.info("Pressing tiger box")
-    try:
-        btn = driver.find_element(By.XPATH, "//div[contains(@class, 'tiger-box')]")
-        if 'suspended' in cast(str, btn.get_attribute('class')):
-            time.sleep(1)
-            press_tiger_box(driver)
-        else:
-            btn.click()
-    except Exception as e:
-        logging.error('Could not press tiger box')
-        # logging.error(e)
-        raise e
+
+    def try_press():
+        try:
+            btn = driver.find_element(By.XPATH, "//div[contains(@class, 'tiger-box')]")
+            if 'suspended' in cast(str, btn.get_attribute('class')):
+                time.sleep(1)
+                return try_press()  # retry recursively
+            else:
+                btn.click()
+        except Exception as e:
+            logging.error('Could not press tiger box')
+            raise e
+
+    try_press()
+
     
 def verify_bet(driver: uc.Chrome):
     logging.info("Verifying bet")
@@ -44,10 +52,7 @@ def verify_bet(driver: uc.Chrome):
             EC.presence_of_element_located(
                 (By.XPATH, '//div[@class="toast-body"]'))
         )
-        if 'Bet placed Sucessfully' in toast.text:
-            return True
-        else:
-            return False
+        return 'Bet placed Sucessfully' in toast.text
     except Exception as e:
         logging.error('Could not verify bet')
 
@@ -104,10 +109,6 @@ def extract_results(driver: uc.Chrome) -> list[str] | None:
 def wait_for_results(driver: uc.Chrome):
     logging.info("Waiting for results")
     try:
-        # WebDriverWait(driver, 25).until(
-        #     EC.presence_of_element_located(
-        #         (By.CLASS_NAME, "base-timer__label green"))
-        # )
         prev_results: list[str] | None = None
         while True:
             results = extract_results(driver)

@@ -102,23 +102,13 @@ def generate_daily_report(csv_file_path: str, report_date_str: str) -> dict:
     # 3. Calculate Total Profit
     total_profit = end_balance_for_day - start_balance_for_day
 
-    # Alternative for total_profit (sum of P/L for each bet):
-    # daily_df.loc[:, 'pnl'] = daily_df.apply(
-    #     lambda row: row['bet_amount'] if row['outcome'] == 'win' else -row['bet_amount'] if row['outcome'] == 'loss' else 0,
-    #     axis=1
-    # )
-    # total_profit_alt = daily_df['pnl'].sum()
-    # print(f"Debug: Profit (Start/End Bal): {total_profit}, Profit (Sum PNL): {total_profit_alt}")
-
-    report = {
+    return {
         "report_date": report_date_str,
         "total_rounds_played": total_rounds_played,
         "total_wins": total_wins,
         "total_losses": total_losses,
-        "total_profit": float(total_profit)
+        "total_profit": float(total_profit),
     }
-
-    return report
 
 
 if __name__ == '__main__':

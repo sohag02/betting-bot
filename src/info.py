@@ -24,8 +24,9 @@ def get_last_result(driver: uc.Chrome):
         return result_map[classname]
     except Exception as e:
         logging.error('Could not get last result')
-        logging.error(e)
-        return None
+        # logging.error(e)
+        # return None
+        raise e
     
 def get_current_balance(driver: uc.Chrome):
     logging.info("Getting current balance")

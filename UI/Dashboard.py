@@ -178,6 +178,5 @@ try:
     daily_report = pd.read_csv("data/daily_report.csv")
 
     st.dataframe(daily_report)
-except:
+except Exception:
     st.write("No Daily Report Available")
-    pass

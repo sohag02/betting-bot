@@ -102,7 +102,7 @@ def save_daily_report():
 
 def is_daily_report_generated() -> bool:
     yesterday = (datetime.now() - timedelta(days=1)).date().strftime("%Y-%m-%d")
-    if os.path.exists(f"data/daily_report.csv"):
+    if os.path.exists("data/daily_report.csv"):
         with open('data/daily_report.csv', 'r', newline='') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:

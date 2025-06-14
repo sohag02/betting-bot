@@ -86,7 +86,7 @@ def calculate_bet_metrics(csv_file_path: str) -> dict:
     total_rounds = len(df)
     wins = df[df['outcome'] == 'w'].shape[0]
     losses = df[df['outcome'] == 'l'].shape[0]
-    final_wallet_balance = df.iloc[-1]['balance'] if not df.empty else 0.0
+    final_wallet_balance = 0.0 if df.empty else df.iloc[-1]['balance']
 
     max_losing_streak = 0
     current_losing_streak = 0
@@ -100,7 +100,7 @@ def calculate_bet_metrics(csv_file_path: str) -> dict:
     if current_losing_streak > max_losing_streak:  # Check for a streak ending at the last round
         max_losing_streak = current_losing_streak
 
-    max_bet_placed: int = df['bet_amount'].max() if not df.empty else 0
+    max_bet_placed: int = 0 if df.empty else df['bet_amount'].max()
 
     total_profit = final_wallet_balance - initial_balance
 
@@ -109,7 +109,7 @@ def calculate_bet_metrics(csv_file_path: str) -> dict:
     else:
         profit_percentage = 0.0  # Or "N/A" or handle as infinite if total_profit > 0
 
-    metrics = {
+    return {
         "Total Rounds": total_rounds,
         "Wins": wins,
         "Losses": losses,
@@ -117,10 +117,8 @@ def calculate_bet_metrics(csv_file_path: str) -> dict:
         "Maximum Losing Streak": max_losing_streak,
         "Max Bet Placed": float(max_bet_placed),
         "Total Profit": float(total_profit),
-        "Profit Percentage": float(profit_percentage)
+        "Profit Percentage": float(profit_percentage),
     }
-
-    return metrics
 
 
 if __name__ == '__main__':
