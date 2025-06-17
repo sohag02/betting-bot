@@ -21,6 +21,8 @@ st.markdown("""
 
 st.markdown("#### Last Error Screenshot")
 if os.path.exists("screenshot.png"):
+    mod_time = os.path.getmtime("screenshot.png")
+    st.write(f"Last Updated: {datetime.fromtimestamp(mod_time).strftime('%Y-%m-%d %H:%M:%S')}")
     st.image("screenshot.png")
     with open("screenshot.png", "rb") as file:
         st.download_button(

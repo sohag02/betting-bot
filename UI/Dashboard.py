@@ -2,6 +2,7 @@ from src.analytics.summary import calculate_bet_metrics
 import plotly.express as px
 import pandas as pd
 import streamlit as st
+from collections import Counter
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -127,6 +128,33 @@ def profit_per_hour_heatmap(df: pd.DataFrame):
 
     return st.plotly_chart(fig)
 
+def lossing_streak_lenght(df: pd.DataFrame):
+    # Get only the outcome column
+    outcomes = df['outcome'].tolist()
+
+    # Detect losing streaks
+    streaks = []
+    current_streak = 0
+
+    for outcome in outcomes:
+        if outcome in ['L', 'TIE']:
+            current_streak += 1
+        elif current_streak > 0:
+            streaks.append(current_streak)
+            current_streak = 0
+
+    if current_streak > 0:
+        streaks.append(current_streak)
+
+    streak_counts = Counter(streaks)
+
+    # Convert to DataFrame for display and plotting
+    streak_df = pd.DataFrame(sorted(streak_counts.items()), columns=["Streak Length", "Count"])
+    streak_df = streak_df.set_index("Streak Length")
+
+    return st.bar_chart(streak_df)
+
+
 
 metrics = calculate_bet_metrics("data/betting_log.csv")
 
@@ -173,6 +201,9 @@ with col3:
 with col4:
     st.markdown("### Profit per Hour")
     profit_per_hour_heatmap(df)
+
+st.markdown("### Streak Length")
+lossing_streak_lenght(df)
 
 try:
     st.markdown("## Daily Report")
