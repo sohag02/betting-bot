@@ -48,7 +48,7 @@ def press_tiger_box(driver: uc.Chrome):
 def verify_bet(driver: uc.Chrome):
     logging.info("Verifying bet")
     try:
-        toast = WebDriverWait(driver, 10).until(
+        toast = WebDriverWait(driver, 20).until(
             EC.presence_of_element_located(
                 (By.XPATH, '//div[@class="toast-body"]'))
         )

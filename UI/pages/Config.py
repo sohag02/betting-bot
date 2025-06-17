@@ -45,6 +45,11 @@ with st.form("config"):
     enabled = st.toggle("Enabled", value=config.demo.enabled)
     assumed_balance = st.text_input("Assumed Balance", value=config.demo.assumed_balance)
 
+    st.markdown("#### Break")
+    enabled = st.toggle("Enabled", key='break', value=config.break_options.enabled)
+    interval = st.number_input("Interval", value=config.break_options.interval/60, step=1.0, format="%.0f")
+    duration = st.number_input("Duration", value=config.break_options.duration/60, step=1.0, format="%.0f")
+
     st.markdown("#### Sleep")
     col1, col2 = st.columns(2)
     with col1:
@@ -78,9 +83,7 @@ with st.form("config"):
     admin_username = st.text_input("Admin Username", value=config.telegram.admin_username)
 
 
-    submitted = st.form_submit_button("Run")
-
-    if submitted:
+    if submitted := st.form_submit_button("Save"):
         updater = ConfigUpdater()
         updater.read('config.ini')
 
@@ -94,6 +97,10 @@ with st.form("config"):
 
         updater['DEMO']['enabled'] = enabled
         updater['DEMO']['assumed_balance'] = assumed_balance
+
+        updater['BREAK']['enabled'] = enabled
+        updater['BREAK']['interval'] = int(interval)
+        updater['BREAK']['duration'] = int(duration)
 
         updater['BEHAVIOUR']['pause_min'] = pause_min
         updater['BEHAVIOUR']['pause_max'] = pause_max

@@ -44,7 +44,7 @@ def login(driver: uc.Chrome):
         By.XPATH, "//button[@class='btn btn-primary ml-1' and normalize-space(text())='Login']")
     login_btn.click()
     delay()
-    username = WebDriverWait(driver, 10).until(
+    username = WebDriverWait(driver, 20).until(
         EC.presence_of_element_located((By.XPATH, "//input[@placeholder='Enter Username']"))
     )
     username.send_keys(config.login.username)

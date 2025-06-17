@@ -20,6 +20,12 @@ class Demo:
     assumed_balance: int
 
 @dataclass
+class Break:
+    enabled: bool
+    interval: int
+    duration: int
+
+@dataclass
 class Behaviour:
     pause_min: int
     pause_max: int
@@ -49,6 +55,7 @@ class Config:
         self.login = self._get_login()
         self.betting = self._get_betting()
         self.demo = self._get_demo()
+        self.break_options = self._get_break()
         self.behaviour = self._get_behaviour()
         self.sleep = self._get_sleep()
         self.notification = self._get_notification()
@@ -72,6 +79,13 @@ class Config:
         return Demo(
             enabled=self.config.getboolean("DEMO", "enabled"),
             assumed_balance=int(self.config["DEMO"]["assumed_balance"])
+        )
+    
+    def _get_break(self):
+        return Break(
+            enabled=self.config.getboolean("BREAK", "enabled"),
+            interval=int(self.config["BREAK"]["interval"]) * 60,  # minutes to seconds
+            duration=int(self.config["BREAK"]["duration"]) * 60
         )
 
     def _get_behaviour(self):
