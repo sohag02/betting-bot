@@ -1,11 +1,11 @@
+from src.analytics.summary import calculate_bet_metrics
+import plotly.express as px
+import pandas as pd
+import streamlit as st
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-from src.analytics.summary import calculate_bet_metrics
 
 st.set_page_config(page_title="Dashboard", layout="wide")
 st.title("Dashboard")
@@ -61,6 +61,7 @@ with st.sidebar:
 @st.cache_data(ttl=10)  # cache for 10 seconds
 def load_data():
     return pd.read_csv("data/betting_log.csv", parse_dates=["timestamp"])
+
 
 df = load_data()
 
@@ -176,6 +177,21 @@ with col4:
 try:
     st.markdown("## Daily Report")
     daily_report = pd.read_csv("data/daily_report.csv")
+
+    # Rename headers to more user-friendly names
+    header_mapping = {
+        'report_date': 'Date',
+        'rounds_played': 'Rounds',
+        'wins': 'Wins',
+        'losses': 'Losses',
+        'profit': 'Profit',
+        'max_bet_placed': 'Max Bet',
+        'max_losing_streak': 'Max Losing Streak',
+        'start_balance': 'Start Balance',
+        'final_balance': 'Final Balance'
+    }
+
+    daily_report = daily_report.rename(columns=header_mapping)
 
     st.dataframe(daily_report)
 except Exception:

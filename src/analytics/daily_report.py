@@ -30,7 +30,11 @@ def generate_daily_report(csv_file_path: str, report_date_str: str) -> dict:
         "total_rounds_played": 0,
         "total_wins": 0,
         "total_losses": 0,
-        "total_profit": 0.0
+        "total_profit": 0.0,
+        "max_bet_placed": 0,
+        "max_losing_streak": 0,
+        "start_balance": 0.0,
+        "final_balance": 0.0,
     }
 
     try:
@@ -102,15 +106,35 @@ def generate_daily_report(csv_file_path: str, report_date_str: str) -> dict:
     # 3. Calculate Total Profit
     total_profit = end_balance_for_day - start_balance_for_day
 
+    # 4. Calculate max loss streak
+    max_losing_streak = 0
+    current_losing_streak = 0
+    for outcome in daily_df['outcome']:
+        if outcome in ['l', 'tie']:
+            current_losing_streak += 1
+        else:
+            if current_losing_streak > max_losing_streak:
+                max_losing_streak = current_losing_streak
+            current_losing_streak = 0
+    if current_losing_streak > max_losing_streak:  # Check for a streak ending at the last round
+        max_losing_streak = current_losing_streak
+
+    # 5. Calculate max bet placed
+    max_bet_placed: int = 0 if daily_df.empty else daily_df['bet_amount'].max()
+
     return {
         "report_date": report_date_str,
         "total_rounds_played": total_rounds_played,
         "total_wins": total_wins,
         "total_losses": total_losses,
         "total_profit": float(total_profit),
+        "max_bet_placed": max_bet_placed,
+        "max_losing_streak": max_losing_streak,
+        "start_balance": start_balance_for_day,
+        "final_balance": end_balance_for_day,
     }
 
 
 if __name__ == '__main__':
-    report = generate_daily_report("data/betting_log.csv", "2025-05-22")
+    report = generate_daily_report("data/betting_log.csv", "2025-06-12")
     print(report)

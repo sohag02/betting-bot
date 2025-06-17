@@ -87,7 +87,7 @@ def save_daily_report():
         with open('data/daily_report.csv', 'w', newline='') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(
-                ['report_date', 'rounds_played', 'wins', 'losses', 'profit'])
+                ['report_date', 'rounds_played', 'wins', 'losses', 'profit', 'max_bet_placed', 'max_losing_streak', 'start_balance', 'final_balance'])
             
     with open('data/daily_report.csv', 'a', newline='') as csvfile:
         writer = csv.writer(csvfile)
@@ -96,7 +96,11 @@ def save_daily_report():
             report["total_rounds_played"],
             report["total_wins"],
             report["total_losses"],
-            report["total_profit"]
+            report["total_profit"],
+            report["max_bet_placed"],
+            report["max_losing_streak"],
+            report["start_balance"],
+            report["final_balance"],
         ])
     logging.info("Successfully saved daily report")
 
@@ -128,5 +132,5 @@ def generate_graphs():
     logging.info("Successfully generated graphs")
 
 if __name__ == "__main__":
-    # save_daily_report()
-    save_summary()
+    save_daily_report()
+    # save_summary()
