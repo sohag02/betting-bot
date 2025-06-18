@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from src.config import get_config
-from src.utils import delay
+from src.utils import delay, retry
 
 config = get_config()
 
@@ -30,6 +30,7 @@ def demo_login(driver: uc.Chrome):
     logging.info("Demo Login successful")
     close_modal(driver)
 
+@retry(retries=3, delay=2)
 def login(driver: uc.Chrome):
 
     if config.login.use_demo:

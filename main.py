@@ -96,11 +96,13 @@ class BettingBot:
         """Initialize and configure Chrome driver."""
         options = uc.ChromeOptions()
         options.add_argument("--log-level=3")
-        driver = uc.Chrome(options=options)
-        driver.get(config.betting.site_link)
-        login(driver)
-        driver.get(config.betting.game_link)
-        return driver
+        return uc.Chrome(options=options)
+    
+    def login(self) -> None:
+        """Login to the site."""
+        self.driver.get(config.betting.site_link)
+        login(self.driver)
+        self.driver.get(config.betting.game_link)
     
     def setup_demo_mode(self) -> None:
         """Setup demo mode if enabled."""
@@ -298,18 +300,19 @@ class BettingBot:
     def run_main_session(self) -> None:
         """Run the main betting session."""
         logging.info("Starting a new bot session.")
-        
+
         try:
             self.setup_directories_and_files()
             self.driver = self.initialize_driver()
+            self.login()
             self.setup_demo_mode()
-            
+
             # Main betting loop
             while self.run_betting_cycle():
                 pass  # Continue until run_betting_cycle returns False
-                
+
         except Exception as e:
-            logging.error(f"Error in main session: {e}", exc_info=True)
+            logging.error("Error in main session", exc_info=True)
             raise
         finally:
             if self.driver:
@@ -338,7 +341,7 @@ def run_bot() -> None:
             bot.run_main_session()
             
         except Exception as e:
-            logging.critical(f"A critical error occurred: {e}", exc_info=True)
+            # logging.critical(f"A critical error occurred: {e}", exc_info=True)
             logging.error("Restarting the bot in 60 seconds...")
             time.sleep(60)
 

@@ -1,6 +1,6 @@
 import json
 import os
-
+from functools import wraps
 import pandas as pd
 from src.config import get_config
 from selenium.webdriver.remote.webdriver import WebDriver
@@ -130,6 +130,30 @@ def generate_graphs():
     bet_size_histogram(df)
     profit_per_hour_heatmap(df)
     logging.info("Successfully generated graphs")
+
+def retry(retries: int = 3, delay: float = 1.0):
+    """
+    Decorator to retry a function on exception.
+
+    Args:
+        retries (int): Number of retries before giving up.
+        delay (float): Delay between retries in seconds.
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            for attempt in range(1, retries + 1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exception = e
+                    print(f"[Retry {attempt}/{retries}]")
+                    time.sleep(delay)
+            raise last_exception  # Raise the last caught exception if all retries fail
+        return wrapper
+    return decorator
+
 
 if __name__ == "__main__":
     save_daily_report()
