@@ -11,6 +11,7 @@ import random
 import csv
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from selenium.webdriver.common.action_chains import ActionChains
 from src.analytics.daily_report import generate_daily_report
 from src.analytics.summary import calculate_bet_metrics
 from src.analytics.graphs import generate_capital_growth_curve, win_loss_pie_chart, bet_size_histogram, profit_per_hour_heatmap
@@ -25,6 +26,10 @@ class BetLog:
     result: str
     outcome: str
     balance: int
+
+def move_mouse(driver: WebDriver):
+    actions = ActionChains(driver)
+    actions.move_by_offset(10, 10).click().perform()
 
 
 def delay():
