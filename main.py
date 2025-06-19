@@ -19,7 +19,7 @@ from src.info import get_current_balance, get_last_result, get_round_id
 from src.tg import notify, send_sync
 from src.utils import (BetLog, delay, generate_graphs,
                        is_daily_report_generated, is_eod, is_now_in_range,
-                       log_bet, save_daily_report, save_summary, reconnect)
+                       log_bet, save_daily_report, save_summary, reconnect, move_mouse)
 from src.login import login
 
 config = get_config()
@@ -115,6 +115,15 @@ class BettingBot:
                            else get_last_demo_balance())
         update_demo_balance(self.driver, self.demo_balance)
         logging.info(f"Using Demo balance: {self.demo_balance}")
+
+    def capture_screenshot(self) -> None:
+        """Capture screenshot of the current game state."""
+        if not self.driver:
+            return
+        
+        screenshot_path = os.path.join("internal", "screenshot.png")
+        self.driver.save_screenshot(screenshot_path)
+        logging.info(f"Screenshot saved to: {screenshot_path}")
     
     def get_current_balance(self) -> Optional[float]:
         """Get current balance (demo or real)."""
@@ -241,6 +250,7 @@ class BettingBot:
         time.sleep(5)
         
         bet_choice = self.determine_bet_choice(last_result)
+        move_mouse(self.driver)
         self.place_bet_action(bet_choice)
         delay()
         
@@ -285,6 +295,7 @@ class BettingBot:
                 )
             )
         
+        move_mouse(self.driver)
         delay()
         save_summary()
 
@@ -312,6 +323,7 @@ class BettingBot:
                 pass  # Continue until run_betting_cycle returns False
 
         except Exception as e:
+            self.capture_screenshot()
             logging.error("Error in main session", exc_info=True)
             raise
         finally:
